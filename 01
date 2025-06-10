@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>กำลังดึงตำแหน่ง...</title> <!-- Sets the title of the web page shown in the browser tab -->
+  <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Configures the viewport for responsive design across devices -->
+  <style>
+    /* Basic styling for the message container */
+    .message-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh; /* Full viewport height */
+      font-family: 'Inter', sans-serif; /* Using Inter font as per guidelines */
+      background-color: #f0f4f8; /* Light background */
+    }
+
+    .message-box {
+      background-color: #ffffff; /* White background for the box */
+      padding: 2rem;
+      border-radius: 0.75rem; /* Rounded corners */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+      text-align: center;
+      max-width: 90%;
+      color: #333;
+    }
+
+    .message-box p {
+      font-size: 1.125rem; /* Larger font size for readability */
+      margin-bottom: 1rem;
+    }
+
+    .message-box button {
+      background-color: #3b82f6; /* Blue button */
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 0.5rem; /* Rounded button */
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .message-box button:hover {
+      background-color: #2563eb; /* Darker blue on hover */
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="message-container" id="loadingMessage">
+    <div class="message-box">
+      <p>กำลังโหลดตำแหน่งของคุณ กรุณารอสักครู่...</p> <!-- Displays a loading message to the user -->
+    </div>
+  </div>
+
+  <script>
+    // Get references to the loading and error message containers
+    const loadingMessageDiv = document.getElementById('loadingMessage');
+
+    // Function to display an error message
+    function displayErrorMessage(message) {
+      loadingMessageDiv.innerHTML = `
+        <div class="message-box">
+          <p>${message}</p>
+          <button onclick="location.reload()">ลองใหม่อีกครั้ง</button>
+        </div>
+      `;
+      loadingMessageDiv.style.display = 'flex'; // Ensure the container is visible
+    }
+
+    // Uses the Geolocation API to get the user's current position
+    // If successful, the `pos` object contains the coordinates. If an error occurs, the `err` object contains error details.
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      // Hide the loading message once location is obtained
+      loadingMessageDiv.style.display = 'none';
+
+      // Extracts latitude and longitude from the position object and formats them to 6 decimal places for precision
+      const lat = pos.coords.latitude.toFixed(6);
+      const lng = pos.coords.longitude.toFixed(6);
+
+      // ——————————————————————————————
+      // IMPORTANT: Change these two values to match your specific Google Form setup
+      // Replace with the actual URL of your Google Form
+      const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSen0WiskZGdwrVbxaomauj_E0KzEcRQll_ItvFxPp54Tk0FIQ/viewform"; // ลิงก์ฟอร์มของคุณ (Your form link)
+      // Replace with the correct 'entry ID' for the location input field in your Google Form
+      const entryId = "entry.1974648496";                                 // entry ID ของช่อง “ตำแหน่ง” (Entry ID for the "Location" field)
+      // ——————————————————————————————
+
+      // Constructs the URL to automatically pre-fill the Google Form with the obtained latitude and longitude
+      // 'usp=pp_url' is a standard Google Forms parameter indicating a pre-filled URL.
+      // '${entryId}=${lat},${lng}' appends the combined latitude and longitude data to the specified form field.
+      window.location.href = `${formUrl}?usp=pp_url&${entryId}=${lat},${lng}`;
+    }, function(err) {
+      // This function is executed if there's an error when trying to retrieve the user's location.
+      // Calls the custom function to display a user-friendly error message instead of `alert()`.
+      displayErrorMessage("ไม่สามารถดึงตำแหน่งได้ โปรดลองใหม่อีกครั้ง");
+
+      // Optional: Log the error for debugging purposes
+      console.error("Error getting location:", err);
+    });
+  </script>
+</body>
+</html>
